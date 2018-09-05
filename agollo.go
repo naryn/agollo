@@ -49,3 +49,15 @@ func GetStringValue(key, defaultValue string) string {
 func GetNameSpaceContent(namespace, defaultValue string) string {
 	return defaultClient.GetNameSpaceContent(namespace, defaultValue)
 }
+
+func GetNameSpaceContentMap(namespace string) map[string]string {
+	return defaultClient.GetNameSpaceContentMap(namespace)
+}
+
+func GetNameSpaceContentMapMerge(namespace string) map[string]map[string]string {
+	return defaultClient.GetNameSpaceContentMapMerge(namespace)
+}
+
+func GetNameSpaceContentMapMergeTree(namespace string) map[string][]map[string]string {
+	return defaultClient.GetNameSpaceContentMapMergeTree(namespace)
+}

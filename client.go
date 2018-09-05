@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 // Client for apollo
@@ -126,7 +127,51 @@ func (c *Client) GetStringValue(key, defaultValue string) string {
 
 // GetNameSpaceContent get contents of namespace
 func (c *Client) GetNameSpaceContent(namespace, defaultValue string) string {
-	return c.GetStringValueWithNameSpace(namespace, "content", defaultValue)
+
+	cache := c.mustGetCache(namespace)
+	kv := cache.dump()
+	res, _ := json.Marshal(kv)
+	return string(res)
+}
+
+func (c *Client) GetNameSpaceContentMap(namespace string) map[string]string {
+
+	cache := c.mustGetCache(namespace)
+	return cache.dump()
+}
+
+func (c *Client) GetNameSpaceContentMapMerge(namespace string) map[string]map[string]string {
+	mapData := c.GetNameSpaceContentMap(namespace)
+	mapMergeData := make(map[string]map[string]string)
+	if mapData != nil {
+		for k, v := range mapData {
+			keys := strings.Split(k, ".")
+			if _, ok := mapMergeData[keys[0]]; !ok {
+				mapMergeData[keys[0]] = make(map[string]string)
+			}
+			if len(keys) > 1 {
+				mapMergeData[keys[0]][keys[1]] = v
+			}
+		}
+	}
+
+	return mapMergeData
+}
+
+func (c *Client) GetNameSpaceContentMapMergeTree(namespace string) map[string][]map[string]string {
+	mapMergeData := c.GetNameSpaceContentMapMerge(namespace)
+	result := make(map[string][]map[string]string)
+	if mapMergeData != nil {
+		for key, v := range mapMergeData {
+			subKeys := strings.Split(key, "_")
+			if _, ok := result[subKeys[0]]; !ok {
+				result[subKeys[0]] = make([]map[string]string, 0)
+			}
+			result[subKeys[0]] = append(result[subKeys[0]], v)
+		}
+	}
+
+	return result
 }
 
 // sync namespace config
@@ -137,6 +182,7 @@ func (c *Client) sync(namesapce string) (*ChangeEvent, error) {
 	if err != nil || len(bts) == 0 {
 		return nil, err
 	}
+
 	var result result
 	if err := json.Unmarshal(bts, &result); err != nil {
 		return nil, err
@@ -162,7 +208,6 @@ func (c *Client) handleResult(result *result) *ChangeEvent {
 		Namespace: result.NamespaceName,
 		Changes:   map[string]*Change{},
 	}
-
 	cache := c.mustGetCache(result.NamespaceName)
 	kv := cache.dump()
 
