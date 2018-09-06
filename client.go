@@ -233,7 +233,7 @@ func (c *Client) handleResult(result *result) *ChangeEvent {
 	c.setReleaseKey(result.NamespaceName, result.ReleaseKey)
 
 	// dump caches to file
-	c.dump(defaultDumpFile)
+	c.dump(c.conf.Env + defaultDumpFile)
 
 	if len(ret.Changes) == 0 {
 		return nil
