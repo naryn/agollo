@@ -2,6 +2,7 @@ package agollo
 
 import (
 	"encoding/gob"
+	"encoding/json"
 	"os"
 	"sync"
 )
@@ -39,7 +40,7 @@ func (n *namespaceCache) drain() {
 	}
 }
 
-func (n *namespaceCache) dump(name string) error {
+func (n *namespaceCache) dump(name string, encodeType string) error {
 
 	var dumps = map[string]map[string]string{}
 
@@ -53,10 +54,13 @@ func (n *namespaceCache) dump(name string) error {
 	}
 	defer f.Close()
 
+	if encodeType == "json" {
+		return json.NewEncoder(f).Encode(&dumps)
+	}
 	return gob.NewEncoder(f).Encode(&dumps)
 }
 
-func (n *namespaceCache) load(name string) error {
+func (n *namespaceCache) load(name string, encodeType string) error {
 	n.drain()
 
 	f, err := os.OpenFile(name, os.O_RDONLY, 0755)
@@ -67,8 +71,14 @@ func (n *namespaceCache) load(name string) error {
 
 	var dumps = map[string]map[string]string{}
 
-	if err := gob.NewDecoder(f).Decode(&dumps); err != nil {
-		return err
+	if encodeType == "json" {
+		if err := json.NewDecoder(f).Decode(&dumps); err != nil {
+			return err
+		}
+	} else {
+		if err := gob.NewDecoder(f).Decode(&dumps); err != nil {
+			return err
+		}
 	}
 
 	for namespace, kv := range dumps {

@@ -42,13 +42,13 @@ func TestCacheDump(t *testing.T) {
 	f.Close()
 	defer os.Remove(f.Name())
 
-	if err := caches.dump(f.Name()); err != nil {
+	if err := caches.dump(f.Name(), ""); err != nil {
 		t.Error(err)
 	}
 
 	var restore = newNamespaceCahce()
 	defer restore.drain()
-	if err := restore.load(f.Name()); err != nil {
+	if err := restore.load(f.Name(), ""); err != nil {
 		t.Error(err)
 	}
 
@@ -56,11 +56,11 @@ func TestCacheDump(t *testing.T) {
 		t.FailNow()
 	}
 
-	if err := restore.load("null"); err == nil {
+	if err := restore.load("null", ""); err == nil {
 		t.FailNow()
 	}
 
-	if err := restore.load("./testdata/app.properties"); err == nil {
+	if err := restore.load("./testdata/app.properties", ""); err == nil {
 		t.FailNow()
 	}
 }

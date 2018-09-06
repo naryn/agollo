@@ -96,12 +96,12 @@ func (c *Client) preload() error {
 
 // loadLocal load caches from local file
 func (c *Client) loadLocal(name string) error {
-	return c.caches.load(name)
+	return c.caches.load(name, c.conf.EncodeType)
 }
 
 // dump caches to file
 func (c *Client) dump(name string) error {
-	return c.caches.dump(name)
+	return c.caches.dump(name, c.conf.EncodeType)
 }
 
 // WatchUpdate get all updates
