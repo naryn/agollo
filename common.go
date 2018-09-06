@@ -35,11 +35,12 @@ func notificationURL(conf *Conf, notifications string) string {
 }
 
 func configURL(conf *Conf, namespace, releaseKey string) string {
-	return fmt.Sprintf("http://%s/configs/%s/%s/%s?releaseKey=%s&ip=%s",
+	return fmt.Sprintf("http://%s/configs/%s/%s/%s?secretKey=%s&releaseKey=%s&ip=%s",
 		conf.IP,
 		url.QueryEscape(conf.AppID),
 		url.QueryEscape(conf.Cluster),
 		url.QueryEscape(namespace),
+		url.QueryEscape(conf.SecretKey),
 		releaseKey,
 		getLocalIP())
 }
