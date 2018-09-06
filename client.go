@@ -83,6 +83,11 @@ func (c *Client) Stop() error {
 
 // fetchAllCinfig fetch from remote, if failed load from local file
 func (c *Client) preload() error {
+
+	if c.conf.LocalFirst {
+		return c.loadLocal(c.conf.Env + defaultDumpFile)
+	}
+
 	if err := c.longPoller.preload(); err != nil {
 		return c.loadLocal(c.conf.Env + defaultDumpFile)
 	}

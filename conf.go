@@ -13,6 +13,7 @@ type Conf struct {
 	IP             string   `json:"ip,omitempty"`
 	SecretKey      string   `json:"secretKey,omitempty"`
 	Env            string   `json:"env,omitempty"`
+	LocalFirst     bool     `json:"localFirst"`
 }
 
 // NewConf create Conf from file
