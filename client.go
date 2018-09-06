@@ -55,8 +55,10 @@ func (c *Client) Start() error {
 		return err
 	}
 
-	// start fetch update
-	go c.longPoller.start()
+	if !c.conf.WatchClose {
+		// start fetch update
+		go c.longPoller.start()
+	}
 
 	return nil
 }
